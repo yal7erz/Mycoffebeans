@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>سجل القهوة المختصة - Specialty Coffee Journal</title>
+  
+  <!-- PWA & iOS Native Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="مذكرتي للبن" />
+  <meta name="theme-color" content="#341d17" />
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/341d17/f5efe8?text=Coffee" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons for iOS-style iconography -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            espresso: {
+              50: '#fbf8f5',
+              100: '#f5efe8',
+              200: '#ebdccf',
+              300: '#ddc2ae',
+              400: '#cba086',
+              500: '#bc8365',
+              600: '#ad6f54',
+              700: '#8e5642',
+              800: '#5c372b',
+              900: '#341d17',
+              950: '#1d0f0c',
+            },
+            iosGreen: '#34C759',
+            iosRed: '#FF3B30',
+            iosOrange: '#FF9500',
+            iosBlue: '#007AFF',
+            iosPurple: '#AF52DE',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          boxShadow: {
+            'ios': '0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+            'ios-float': '0 12px 32px -4px rgba(44, 24, 16, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .ios-glass {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 16px);
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  </style>
+</head>
+<body class="bg-espresso-50 text-stone-900 dark:bg-[#12100e] dark:text-stone-100 h-full flex flex-col font-sans transition-colors duration-200">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="ios-glass sticky top-0 z-30 bg-espresso-50/90 dark:bg-[#12100e]/90 border-b border-stone-200/60 dark:border-stone-800/60 safe-top">
+    <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-espresso-800 to-espresso-600 flex items-center justify-center text-amber-200 shadow-sm">
+          <i class="ph-bold ph-coffee text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-espresso-950 dark:text-stone-100 leading-none">مُذكّرة القهوة</h1>
+          <p class="text-[11px] font-medium text-espresso-600 dark:text-espresso-400 mt-0.5">Specialty Coffee Log</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-1.5">
+        <!-- زر المشاركة: لشرح التثبيت على الآيفون -->
+        <button id="installGuideBtn" aria-label="طريقة التثبيت على الآيفون" class="w-9 h-9 rounded-full flex items-center justify-center text-espresso-700 dark:text-amber-400 bg-espresso-100/80 dark:bg-stone-800 hover:bg-stone-200/60 transition active:scale-95" title="تثبيت التطبيق على الشاشة">
+          <i class="ph-bold ph-export text-lg"></i>
+        </button>
+        <!-- زر تبديل الوضع الليلي والنهاري -->
+        <button id="themeToggleBtn" aria-label="تبديل المظهر" class="w-9 h-9 rounded-full flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-800 transition active:scale-95" title="الوضع الليلي">
+          <i class="ph-bold ph-moon-stars text-lg dark:hidden"></i>
+          <i class="ph-bold ph-sun text-lg hidden dark:block text-amber-400"></i>
+        </button>
+        <!-- زر السحابة: النسخ الاحتياطي وتصدير البيانات -->
+        <button id="backupModalBtn" aria-label="النسخ الاحتياطي" class="w-9 h-9 rounded-full flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-800 transition active:scale-95" title="النسخ الاحتياطي">
+          <i class="ph-bold ph-cloud-arrow-up text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="flex-1 overflow-y-auto hide-scrollbar max-w-md w-full mx-auto px-4 pb-28 pt-3">
+    
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="hidden mb-3 p-2.5 bg-stone-800 text-stone-200 rounded-2xl flex items-center justify-between text-xs shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span>أنت غير متصل بالإنترنت (وضع الأوفلاين نشط)</span>
+      </div>
+      <span class="text-[10px] text-stone-400">سجلك متاح للبحث والتصفح</span>
+    </div>
+
+    <!-- TAB 1: FEED / LIST VIEW -->
+    <section id="tab-feed" class="tab-content space-y-4">
+      
+      <!-- Smart Coffee Shop Matcher / Search Alert Box with Camera Scanner -->
+      <div class="relative">
+        <div class="flex items-center bg-stone-200/80 dark:bg-stone-800/80 rounded-2xl px-3 py-2 shadow-inner focus-within:ring-2 focus-within:ring-espresso-600 dark:focus-within:ring-espresso-400 transition">
+          <i class="ph-bold ph-magnifying-glass text-stone-400 text-lg ml-2"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="ابحث بالاسم، المحمصة، أو الدولة..." 
+            class="bg-transparent border-0 outline-none w-full text-sm placeholder-stone-400 text-stone-900 dark:text-stone-100"
+          />
+          <button id="clearSearchBtn" class="hidden text-stone-400 hover:text-stone-600 text-sm p-1 ml-1">
+            <i class="ph-bold ph-x-circle"></i>
+          </button>
+          <!-- Camera Scan in Search Bar -->
+          <button id="triggerSearchScannerBtn" type="button" class="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-espresso-700 to-amber-600 text-white shadow-sm active:scale-95 transition shrink-0" title="فحص كيس القهوة بالكاميرا">
+            <i class="ph-bold ph-camera text-sm"></i>
+            <span>فحص</span>
+          </button>
+          <input type="file" id="searchScannerInput" accept="image/*" capture="environment" class="hidden" />
+        </div>
+
+        <!-- In-Shop Match Alert Indicator -->
+        <div id="matchAlertBanner" class="hidden mt-2 p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center gap-3 transition">
+          <span class="p-2 bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-xl">
+            <i class="ph-fill ph-warning-circle text-lg"></i>
+          </span>
+          <div class="text-xs">
+            <p class="font-bold text-amber-900 dark:text-amber-300" id="matchAlertTitle">تنبيه فحص الكيس!</p>
+            <p class="text-amber-700 dark:text-amber-400/90 text-[11px]" id="matchAlertDesc">جربت هذا المحصول مسبقاً.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Filter Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1 text-xs font-semibold">
+        <button data-filter="all" class="filter-chip active px-3.5 py-1.5 rounded-full bg-espresso-800 text-white dark:bg-espresso-600 shrink-0 transition active:scale-95 shadow-sm">
+          الكل (<span id="count-all">0</span>)
+        </button>
+        <button data-filter="buy-again" class="filter-chip px-3.5 py-1.5 rounded-full bg-stone-200/80 dark:bg-stone-800 text-stone-600 dark:text-stone-300 shrink-0 transition active:scale-95 flex items-center gap-1.5">
+          <i class="ph-fill ph-check-circle text-iosGreen"></i>
+          أشتريه مجدداً (<span id="count-buy">0</span>)
+        </button>
+        <button data-filter="do-not-buy" class="filter-chip px-3.5 py-1.5 rounded-full bg-stone-200/80 dark:bg-stone-800 text-stone-600 dark:text-stone-300 shrink-0 transition active:scale-95 flex items-center gap-1.5">
+          <i class="ph-fill ph-x-circle text-iosRed"></i>
+          لا تكرر الشراء (<span id="count-avoid">0</span>)
+        </button>
+        <button data-filter="top-rated" class="filter-chip px-3.5 py-1.5 rounded-full bg-stone-200/80 dark:bg-stone-800 text-stone-600 dark:text-stone-300 shrink-0 transition active:scale-95 flex items-center gap-1.5">
+          <i class="ph-fill ph-star text-amber-400"></i>
+          الممتازة (★ 5)
+        </button>
+      </div>
+
+      <!-- Coffee Cards List Container -->
+      <div id="coffeeGrid" class="space-y-3.5 pt-1">
+        <!-- Cards will be populated dynamically -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyFeedState" class="hidden py-16 text-center space-y-4">
+        <div class="w-20 h-20 mx-auto rounded-full bg-stone-200/60 dark:bg-stone-800/60 flex items-center justify-center text-espresso-400 text-3xl">
+          <i class="ph-duotone ph-coffee-bean"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 class="font-bold text-base text-stone-800 dark:text-stone-200">سجل تذوقك خالٍ حتى الآن</h3>
+          <p class="text-xs text-stone-500 max-w-xs mx-auto">سجل أكياس البن التي جربتها وتخلص من حيرة تكرار شراء ما لم يعجبك في كل زيارة للمحمصة.</p>
+        </div>
+        <button id="emptyStateAddBtn" class="px-5 py-2.5 bg-espresso-800 hover:bg-espresso-700 text-white rounded-xl text-xs font-bold shadow-md transition active:scale-95">
+          + أضف كيس بن الآن
+        </button>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: BUY AGAIN / WISHLIST -->
+    <section id="tab-wishlist" class="tab-content hidden space-y-4">
+      <div class="bg-gradient-to-r from-emerald-900/10 via-emerald-800/5 to-transparent p-4 rounded-2xl border border-emerald-500/20">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-iosGreen/15 text-iosGreen text-xl font-bold">
+            <i class="ph-fill ph-shopping-bag-open"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-stone-900 dark:text-white">قائمة الأكياس الموصى بها</h2>
+            <p class="text-[11px] text-stone-500">هذه المحاصيل أحببتها وتستحق تكرار شرائها فوراً.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="wishlistContainer" class="space-y-3.5">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div id="emptyWishlistState" class="hidden py-16 text-center space-y-3">
+        <div class="w-16 h-16 mx-auto rounded-full bg-stone-200/50 dark:bg-stone-800/50 flex items-center justify-center text-stone-400 text-2xl">
+          <i class="ph-bold ph-heart-break"></i>
+        </div>
+        <p class="text-xs text-stone-500">لم تقم بتحديد أي محصول لخيار "أشتريه مجدداً" بعد.</p>
+      </div>
+    </section>
+
+    <!-- TAB 3: STATISTICS & TASTING INSIGHTS -->
+    <section id="tab-stats" class="tab-content hidden space-y-4">
+      
+      <!-- Top Numbers Grid -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="bg-white dark:bg-stone-900 p-3 rounded-2xl border border-stone-200/70 dark:border-stone-800 text-center shadow-sm">
+          <p class="text-[11px] text-stone-500 font-medium">إجمالي المحاصيل</p>
+          <p id="statTotalBags" class="text-2xl font-black text-espresso-800 dark:text-espresso-400 mt-1">0</p>
+        </div>
+        <div class="bg-white dark:bg-stone-900 p-3 rounded-2xl border border-stone-200/70 dark:border-stone-800 text-center shadow-sm">
+          <p class="text-[11px] text-stone-500 font-medium">ستشتريها مجدداً</p>
+          <p id="statBuyAgainPct" class="text-2xl font-black text-iosGreen mt-1">0%</p>
+        </div>
+        <div class="bg-white dark:bg-stone-900 p-3 rounded-2xl border border-stone-200/70 dark:border-stone-800 text-center shadow-sm">
+          <p class="text-[11px] text-stone-500 font-medium">متوسط التقييم</p>
+          <p id="statAvgRating" class="text-2xl font-black text-amber-500 mt-1">0.0</p>
+        </div>
+      </div>
+
+      <!-- Origins Breakdown -->
+      <div class="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200/70 dark:border-stone-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+            <i class="ph-bold ph-globe-hemisphere-east text-espresso-600"></i>
+            أكثر دول المنشأ تفضيلاً لك
+          </h3>
+          <span class="text-[10px] text-stone-400">حسب عدد الأكياس</span>
+        </div>
+        <div id="statOriginsBars" class="space-y-2 pt-1">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- Process Breakdown -->
+      <div class="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200/70 dark:border-stone-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+            <i class="ph-bold ph-plant text-emerald-600"></i>
+            طرق المعالجة المفضلة
+          </h3>
+        </div>
+        <div id="statProcessBars" class="space-y-2 pt-1">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- Roasters Breakdown -->
+      <div class="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200/70 dark:border-stone-800 shadow-sm space-y-3">
+        <h3 class="text-xs font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+          <i class="ph-bold ph-fire text-amber-600"></i>
+          المحامص الأكثر تجربة
+        </h3>
+        <div id="statRoastersList" class="flex flex-wrap gap-1.5 pt-1">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL / FORM SCREEN: ADD / EDIT COFFEE ==================== -->
+  <div id="entryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-300">
+    <div class="bg-espresso-50 dark:bg-[#1a1715] w-full max-w-md max-h-[92vh] sm:max-h-[88vh] rounded-t-[28px] sm:rounded-[28px] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between bg-stone-100/70 dark:bg-stone-900/70">
+        <button type="button" id="closeModalBtn" class="text-sm font-semibold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
+          إلغاء
+        </button>
+        <h2 id="modalTitle" class="text-sm font-bold text-stone-900 dark:text-white">إضافة محصول جديد</h2>
+        <button type="button" id="saveCoffeeBtn" class="text-sm font-bold text-espresso-800 dark:text-amber-400 active:scale-95 transition">
+          حفظ
+        </button>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="coffeeForm" class="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs">
+        <input type="hidden" id="coffeeId" />
+
+        <!-- 1. PHOTO UPLOADER WITH CAMERA SUPPORT & AI SCANNER -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">صورة كيس القهوة</label>
+            <span class="text-[10px] bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+              <i class="ph-bold ph-sparkle text-amber-500"></i> قراءة بالذكاء الاصطناعي وتحويل لصورة استوديو
+            </span>
+          </div>
+
+          <div class="relative group">
+            <div id="photoPreviewContainer" class="w-full h-52 rounded-2xl border-2 border-dashed border-stone-300 dark:border-stone-700 bg-stone-100 dark:bg-stone-800/40 flex flex-col items-center justify-center overflow-hidden cursor-pointer relative shadow-inner">
+              <img id="photoPreviewImg" class="w-full h-full object-cover hidden" alt="كيس القهوة" />
+              
+              <!-- AI Processing Overlay -->
+              <div id="aiProcessingOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm hidden flex flex-col items-center justify-center text-white p-4 text-center z-10 space-y-2.5">
+                <div class="w-10 h-10 border-3 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                <p id="aiProgressText" class="font-bold text-xs text-amber-300">جاري فحص الكيس واستخراج البيانات...</p>
+                <p id="aiSubProgressText" class="text-[10px] text-stone-300 max-w-[240px]">يتم قراءة اسم المحمصة، المحصول، الإيحاءات، وتنسيق لقطة استوديو فاخرة</p>
+              </div>
+
+              <div id="photoPlaceholder" class="text-center p-4">
+                <div class="w-12 h-12 mx-auto rounded-full bg-gradient-to-tr from-espresso-700 to-amber-600 flex items-center justify-center text-white text-xl mb-2 shadow-md">
+                  <i class="ph-bold ph-camera"></i>
+                </div>
+                <p class="font-bold text-stone-700 dark:text-stone-300">التقط صورة كيس القهوة</p>
+                <p class="text-[10px] text-stone-400 mt-0.5">سيتم تعبئة كل الخانات تلقائياً وصنع لقطة استوديو للكيس</p>
+              </div>
+            </div>
+            
+            <input type="file" id="coffeePhotoInput" accept="image/*" capture="environment" class="hidden" />
+            
+            <div class="flex items-center gap-2 mt-2" id="photoActionButtons">
+              <button type="button" id="reScanAIBtn" class="hidden flex-1 py-1.5 px-3 rounded-xl bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-300/70 dark:border-amber-800/80 font-bold text-[11px] items-center justify-center gap-1.5 active:scale-95 transition">
+                <i class="ph-bold ph-scan"></i> إعادة التحليل وقراءة الكيس
+              </button>
+              <button type="button" id="generateStudioBtn" class="hidden py-1.5 px-3 rounded-xl bg-espresso-700 text-white font-bold text-[11px] items-center justify-center gap-1.5 active:scale-95 transition">
+                <i class="ph-bold ph-magic-wand"></i> لقطة استوديو
+              </button>
+              <button type="button" id="removePhotoBtn" class="hidden py-1.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-iosRed border border-rose-200 dark:border-rose-900 font-bold text-[11px] items-center justify-center gap-1 active:scale-95 transition">
+                <i class="ph-bold ph-trash"></i> حذف
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. COFFEE & ROASTER NAME -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">اسم المحصول / البن <span class="text-iosRed">*</span></label>
+            <input type="text" id="coffeeName" required placeholder="مثال: يرقاتشيف، قيشا..." class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none focus:border-espresso-600" />
+          </div>
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">المحمصة <span class="text-iosRed">*</span></label>
+            <input type="text" id="roasterName" required placeholder="مثال: كاب، خطوة جمل..." class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none focus:border-espresso-600" />
+          </div>
+        </div>
+
+        <!-- 3. COUNTRY / REGION & PROCESSING -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">بلد المنشأ</label>
+            <input type="text" id="countryOrigin" list="countryList" placeholder="إثيوبيا، كولومبيا..." class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none focus:border-espresso-600" />
+            <datalist id="countryList">
+              <option value="إثيوبيا"></option>
+              <option value="كولومبيا"></option>
+              <option value="اليمن"></option>
+              <option value="البرازيل"></option>
+              <option value="غواتيمالا"></option>
+              <option value="السلفادور"></option>
+              <option value="كوستاريكا"></option>
+              <option value="كينيا"></option>
+              <option value="بنما"></option>
+              <option value="إندونيسيا"></option>
+            </datalist>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">طريقة المعالجة</label>
+            <select id="processingMethod" class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none focus:border-espresso-600">
+              <option value="مجففة (Natural)">مجففة (Natural)</option>
+              <option value="مغسولة (Washed)">مغسولة (Washed)</option>
+              <option value="عسلية (Honey)">عسلية (Honey)</option>
+              <option value="تخمير لا هوائي (Anaerobic)">تخمير لا هوائي (Anaerobic)</option>
+              <option value="أخرى">أخرى / غير محدد</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 4. ROAST LEVEL & BREWING METHOD -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">درجة الحمص</label>
+            <select id="roastLevel" class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none">
+              <option value="فاتح (Light)">فاتح (Light)</option>
+              <option value="متوسط-فاتح (Medium-Light)">متوسط-فاتح (Medium-Light)</option>
+              <option value="متوسط (Medium)">متوسط (Medium)</option>
+              <option value="غامق (Dark)">غامق (Dark/Espresso)</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">أداة التحضير الأساسية</label>
+            <select id="brewMethod" class="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none">
+              <option value="V60">V60 مقطرة</option>
+              <option value="Espresso">إسبريسو (Espresso)</option>
+              <option value="Aeropress">آيروبرس (Aeropress)</option>
+              <option value="Chemex">كيمكس (Chemex)</option>
+              <option value="Kalita Wave">كاليتا ويف (Kalita)</option>
+              <option value="French Press">فرنش بريس</option>
+              <option value="Cold Brew">كولد برو بارد</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5. TASTE NOTES CHIPS -->
+        <div class="space-y-1.5">
+          <label class="block font-bold text-stone-700 dark:text-stone-300">الإيحاءات والنكهات</label>
+          <div class="flex flex-wrap gap-1.5 mb-2" id="quickNotesChips">
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">ياسمين</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">خوخ</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">شوكولاتة</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">توت</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">كراميل</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">حمضيات</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">فواكه استوائية</span>
+            <span class="note-chip cursor-pointer px-2.5 py-1 rounded-lg bg-stone-200/80 dark:bg-stone-800 text-[11px] text-stone-700 dark:text-stone-300">مكسرات</span>
+          </div>
+          <input type="text" id="customTasteNotes" placeholder="أو اكتب إيحاءات إضافية مفصولة بفواصل..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none" />
+        </div>
+
+        <!-- 6. OVERALL RATING -->
+        <div class="space-y-1.5 pt-1">
+          <div class="flex items-center justify-between">
+            <label class="block font-bold text-stone-700 dark:text-stone-300">التقييم العام</label>
+            <span id="starRatingLabel" class="text-[11px] font-bold text-amber-500">استثنائي وفاخر (5/5)</span>
+          </div>
+          <div class="flex items-center justify-center gap-3 py-2 bg-white dark:bg-stone-800/80 rounded-2xl border border-stone-200 dark:border-stone-700" id="starRatingContainer">
+            <button type="button" class="star-btn text-2xl text-amber-400 active:scale-125 transition" data-val="1">★</button>
+            <button type="button" class="star-btn text-2xl text-amber-400 active:scale-125 transition" data-val="2">★</button>
+            <button type="button" class="star-btn text-2xl text-amber-400 active:scale-125 transition" data-val="3">★</button>
+            <button type="button" class="star-btn text-2xl text-amber-400 active:scale-125 transition" data-val="4">★</button>
+            <button type="button" class="star-btn text-2xl text-amber-400 active:scale-125 transition" data-val="5">★</button>
+          </div>
+          <input type="hidden" id="ratingValue" value="5" />
+        </div>
+
+        <!-- 7. CRITICAL DECISION (BUY AGAIN?) -->
+        <div class="space-y-2 pt-1">
+          <label class="block font-black text-stone-800 dark:text-stone-200">القرار الحاسم: هل تكرر الشراء مستقبلاً؟</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="buyAgainDecision" value="yes" class="peer sr-only" checked />
+              <div class="p-2.5 rounded-2xl border border-stone-200 dark:border-stone-700 peer-checked:border-iosGreen peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-950/40 text-center transition">
+                <i class="ph-bold ph-check-circle text-lg text-iosGreen block mb-0.5"></i>
+                <span class="font-bold text-[11px] text-stone-800 dark:text-stone-200">نعم، بالـتأكيد</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="buyAgainDecision" value="maybe" class="peer sr-only" />
+              <div class="p-2.5 rounded-2xl border border-stone-200 dark:border-stone-700 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-950/40 text-center transition">
+                <i class="ph-bold ph-scales text-lg text-amber-500 block mb-0.5"></i>
+                <span class="font-bold text-[11px] text-stone-800 dark:text-stone-200">عادي / ربما</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="buyAgainDecision" value="no" class="peer sr-only" />
+              <div class="p-2.5 rounded-2xl border border-stone-200 dark:border-stone-700 peer-checked:border-iosRed peer-checked:bg-rose-50 dark:peer-checked:bg-rose-950/40 text-center transition">
+                <i class="ph-bold ph-x-circle text-lg text-iosRed block mb-0.5"></i>
+                <span class="font-bold text-[11px] text-stone-800 dark:text-stone-200">لا تشتريه أبداً</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 8. PERSONAL TASTING VERDICT -->
+        <div class="space-y-1 pt-1">
+          <label class="block font-bold text-stone-700 dark:text-stone-300">ملاحظات التذوق ورأيك الصريح</label>
+          <textarea id="personalNotes" rows="3" placeholder="اكتب شعورك الحقيقي عن الطعم، الحمضية، القوام، أو أي نصيحة لاستخلاصه..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-white outline-none resize-none"></textarea>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== CAMERA AI SCANNER RESULT MODAL ==================== -->
+  <div id="scannerResultModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-espresso-50 dark:bg-[#1a1715] w-full max-w-md rounded-t-[28px] sm:rounded-[28px] p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center text-lg">
+            <i class="ph-bold ph-scan"></i>
+          </div>
+          <h3 class="font-bold text-sm text-stone-900 dark:text-white">نتيجة فحص الكيس في المحمصة</h3>
+        </div>
+        <button id="closeScannerResultBtn" class="text-stone-400 hover:text-stone-600 text-lg">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div id="scannerResultBody" class="space-y-3 text-xs">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== IOS INSTALL GUIDE MODAL ==================== -->
+  <div id="installGuideModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-espresso-50 dark:bg-[#1a1715] w-full max-w-md rounded-t-[28px] sm:rounded-[28px] p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-espresso-700 text-white flex items-center justify-center">
+            <i class="ph-bold ph-device-mobile text-lg"></i>
+          </div>
+          <h3 class="font-bold text-sm text-stone-900 dark:text-white">تثبيت التطبيق على شاشة الآيفون</h3>
+        </div>
+        <button id="closeInstallGuideBtn" class="text-stone-400 hover:text-stone-600 text-lg">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs leading-relaxed text-stone-700 dark:text-stone-300">
+        <div class="flex items-start gap-3 p-3 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800">
+          <div class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-400 flex items-center justify-center font-bold shrink-0 mt-0.5">1</div>
+          <div>
+            <p class="font-bold text-stone-900 dark:text-white">افتح الرابط في متصفح Safari</p>
+            <p class="text-[11px] text-stone-500 mt-0.5">تأكد أنك تتصفح من خلال سفاري الرسمي في جهازك.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800">
+          <div class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-400 flex items-center justify-center font-bold shrink-0 mt-0.5">2</div>
+          <div>
+            <p class="font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+              اضغط على زر المشاركة (Share)
+              <i class="ph-bold ph-export text-espresso-700 dark:text-amber-400 text-sm"></i>
+            </p>
+            <p class="text-[11px] text-stone-500 mt-0.5">موجود أسفل شاشة المتصفح في المنتصف.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 p-3 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800">
+          <div class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-400 flex items-center justify-center font-bold shrink-0 mt-0.5">3</div>
+          <div>
+            <p class="font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+              اختر "إضافة إلى الشاشة الرئيسية"
+              <i class="ph-bold ph-plus-square text-espresso-700 dark:text-amber-400 text-sm"></i>
+            </p>
+            <p class="text-[11px] text-stone-500 mt-0.5">ثم اضغط على زر "إضافة" (Add) في الزاوية العلوية.</p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300">
+          <i class="ph-fill ph-check-circle"></i>
+          سيظهر التطبيق كأيقونة مستقلة على شاشة جوالك ويفتح بدون أشرطة سفاري وبسرعة فائقة حتى بدون نت!
+        </div>
+      </div>
+
+      <button id="gotItInstallBtn" class="w-full py-2.5 rounded-xl bg-espresso-800 dark:bg-espresso-600 text-white font-bold text-xs">
+        فهمت ذلك
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== DETAIL PREVIEW MODAL ==================== -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-espresso-50 dark:bg-[#1a1715] w-full max-w-md max-h-[90vh] rounded-t-[28px] sm:rounded-[28px] flex flex-col shadow-2xl overflow-hidden">
+      <div id="detailContent" class="overflow-y-auto p-5 space-y-4">
+        <!-- Rendered on card click -->
+      </div>
+      <div class="p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-100/70 dark:bg-stone-900/70 flex items-center justify-between">
+        <button id="closeDetailBtn" class="px-5 py-2 rounded-xl bg-stone-300 dark:bg-stone-800 text-stone-800 dark:text-stone-200 font-bold text-xs">
+          إغلاق
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="editDetailBtn" class="px-4 py-2 rounded-xl bg-espresso-800 dark:bg-espresso-600 text-white font-bold text-xs flex items-center gap-1.5">
+            <i class="ph-bold ph-pencil-simple"></i>
+            تعديل
+          </button>
+          <button id="deleteDetailBtn" class="px-3.5 py-2 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-iosRed font-bold text-xs">
+            <i class="ph-bold ph-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BACKUP / EXPORT MODAL ==================== -->
+  <div id="backupModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-stone-900 w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-4 text-center border border-stone-200 dark:border-stone-800">
+      <div class="w-12 h-12 rounded-2xl bg-espresso-100 dark:bg-espresso-900/60 text-espresso-700 dark:text-amber-400 mx-auto flex items-center justify-center text-2xl">
+        <i class="ph-bold ph-database"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-sm text-stone-900 dark:text-white">النسخ الاحتياطي لمحاصيلك</h3>
+        <p class="text-[11px] text-stone-500">احفظ كل بياناتك وصورك كملف JSON لضمان عدم ضياع أكثر من 100 محصول جربته.</p>
+      </div>
+
+      <div class="space-y-2 pt-2 text-xs">
+        <button id="exportJsonBtn" class="w-full py-2.5 bg-espresso-800 hover:bg-espresso-700 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+          <i class="ph-bold ph-download-simple"></i>
+          تصدير النسخة الاحتياطية (JSON)
+        </button>
+        <label class="w-full py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer hover:bg-stone-200">
+          <i class="ph-bold ph-upload-simple"></i>
+          استيراد نسخة سابقة
+          <input type="file" id="importJsonInput" accept=".json" class="hidden" />
+        </label>
+      </div>
+
+      <button id="closeBackupModalBtn" class="text-xs text-stone-400 hover:text-stone-600 block mx-auto pt-1">
+        إغلاق
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== NOTIFICATION TOAST ==================== -->
+  <div id="toastNotification" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-2">
+    <div class="bg-stone-900/90 dark:bg-stone-100/95 text-white dark:text-stone-900 px-4 py-2 rounded-full text-xs font-bold shadow-xl flex items-center gap-2 backdrop-blur-md">
+      <i id="toastIcon" class="ph-bold ph-check text-iosGreen"></i>
+      <span id="toastMsg">تم الحفظ بنجاح</span>
+    </div>
+  </div>
+
+  <!-- ==================== BOTTOM TAB BAR (iOS NATIVE LOOK) ==================== -->
+  <nav class="ios-glass fixed bottom-0 left-0 right-0 z-30 bg-espresso-50/95 dark:bg-[#12100e]/95 border-t border-stone-200/80 dark:border-stone-800/80 safe-bottom">
+    <div class="max-w-md mx-auto grid grid-cols-4 h-16 px-2">
+      
+      <!-- 1. Feed Tab -->
+      <button id="btnNavFeed" data-tab="tab-feed" class="tab-nav-btn active flex flex-col items-center justify-center gap-1 text-espresso-800 dark:text-amber-400 transition active:scale-95">
+        <i class="ph-fill ph-coffee text-xl"></i>
+        <span class="text-[10px] font-semibold">دفتر التذوق</span>
+      </button>
+
+      <!-- 2. Wishlist / Rebuy Tab -->
+      <button id="btnNavWishlist" data-tab="tab-wishlist" class="tab-nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 dark:text-stone-500 hover:text-stone-700 transition active:scale-95">
+        <i class="ph-bold ph-heart text-xl"></i>
+        <span class="text-[10px] font-semibold">أشتريه مجدداً</span>
+      </button>
+
+      <!-- 3. Center Action: Quick Add -->
+      <button id="centerAddBtn" type="button" class="flex flex-col items-center justify-center gap-1 text-espresso-800 dark:text-amber-400 group active:scale-90 transition">
+        <div class="w-11 h-11 -mt-4 rounded-full bg-gradient-to-tr from-espresso-800 to-espresso-600 dark:from-espresso-600 dark:to-amber-500 text-white flex items-center justify-center shadow-ios-float">
+          <i class="ph-bold ph-plus text-xl"></i>
+        </div>
+        <span class="text-[10px] font-bold text-stone-700 dark:text-stone-300">أضف محصول</span>
+      </button>
+
+      <!-- 4. Stats Tab -->
+      <button id="btnNavStats" data-tab="tab-stats" class="tab-nav-btn flex flex-col items-center justify-center gap-1 text-stone-400 dark:text-stone-500 hover:text-stone-700 transition active:scale-95">
+        <i class="ph-bold ph-chart-donut text-xl"></i>
+        <span class="text-[10px] font-semibold">إحصائياتي</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    /* ----------------------------------------------------
+       STORAGE & INITIALIZATION
+    ---------------------------------------------------- */
+    const STORAGE_KEY = 'specialty_coffee_journal_db_v2';
+    let coffees = [];
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let currentActiveId = null;
+
+    function loadData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          coffees = JSON.parse(stored);
+        } else {
+          coffees = [];
+        }
+      } catch (e) {
+        console.error("Storage error:", e);
+        coffees = [];
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(coffees));
+      } catch (e) {
+        showToast('تنبيه: حجم الصور كبير، قد يمتلئ تخزين المتصفح', true);
+      }
+      renderAll();
+    }
+
+    /* ----------------------------------------------------
+       DOM ELEMENTS
+    ---------------------------------------------------- */
+    const feedGrid = document.getElementById('coffeeGrid');
+    const emptyFeedState = document.getElementById('emptyFeedState');
+    const emptyStateAddBtn = document.getElementById('emptyStateAddBtn');
+    const wishlistContainer = document.getElementById('wishlistContainer');
+    const emptyWishlistState = document.getElementById('emptyWishlistState');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const matchAlertBanner = document.getElementById('matchAlertBanner');
+    const matchAlertTitle = document.getElementById('matchAlertTitle');
+    const matchAlertDesc = document.getElementById('matchAlertDesc');
+
+    // Counts
+    const countAll = document.getElementById('count-all');
+    const countBuy = document.getElementById('count-buy');
+    const countAvoid = document.getElementById('count-avoid');
+
+    // Modals
+    const entryModal = document.getElementById('entryModal');
+    const detailModal = document.getElementById('detailModal');
+    const backupModal = document.getElementById('backupModal');
+    const coffeeForm = document.getElementById('coffeeForm');
+    const installGuideModal = document.getElementById('installGuideModal');
+    const installGuideBtn = document.getElementById('installGuideBtn');
+    const closeInstallGuideBtn = document.getElementById('closeInstallGuideBtn');
+    const gotItInstallBtn = document.getElementById('gotItInstallBtn');
+    const offlineIndicator = document.getElementById('offlineIndicator');
+
+    // Install Guide Modal Listeners
+    if (installGuideBtn) installGuideBtn.addEventListener('click', () => installGuideModal.classList.remove('hidden'));
+    if (closeInstallGuideBtn) closeInstallGuideBtn.addEventListener('click', () => installGuideModal.classList.add('hidden'));
+    if (gotItInstallBtn) gotItInstallBtn.addEventListener('click', () => installGuideModal.classList.add('hidden'));
+
+    // Network Status
+    function updateOnlineStatus() {
+      if (!navigator.onLine) {
+        offlineIndicator.classList.remove('hidden');
+      } else {
+        offlineIndicator.classList.add('hidden');
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    // Form Inputs
+    const coffeeIdInput = document.getElementById('coffeeId');
+    const coffeeNameInput = document.getElementById('coffeeName');
+    const roasterNameInput = document.getElementById('roasterName');
+    const countryOriginInput = document.getElementById('countryOrigin');
+    const processingMethodInput = document.getElementById('processingMethod');
+    const roastLevelInput = document.getElementById('roastLevel');
+    const brewMethodInput = document.getElementById('brewMethod');
+    const customTasteNotesInput = document.getElementById('customTasteNotes');
+    const ratingValueInput = document.getElementById('ratingValue');
+    const personalNotesInput = document.getElementById('personalNotes');
+    const coffeePhotoInput = document.getElementById('coffeePhotoInput');
+    const photoPreviewImg = document.getElementById('photoPreviewImg');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const reScanAIBtn = document.getElementById('reScanAIBtn');
+    const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+    const aiProcessingOverlay = document.getElementById('aiProcessingOverlay');
+    const aiProgressText = document.getElementById('aiProgressText');
+    const aiSubProgressText = document.getElementById('aiSubProgressText');
+    const generateStudioBtn = document.getElementById('generateStudioBtn');
+
+    /* ----------------------------------------------------
+       PHOTO PROCESSING & AI VISION + STUDIO GENERATION
+    ---------------------------------------------------- */
+    let currentPhotoBase64 = '';
+    let rawCapturedBase64 = '';
+
+    photoPreviewContainer.addEventListener('click', (e) => {
+      if (aiProcessingOverlay.classList.contains('hidden')) {
+        coffeePhotoInput.click();
+      }
+    });
+
+    coffeePhotoInput.addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(event) {
+        const img = new Image();
+        img.onload = async function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1000;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
+          } else if (height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const base64DataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          rawCapturedBase64 = base64DataUrl.split(',')[1];
+          currentPhotoBase64 = base64DataUrl;
+          displayPhotoPreview(currentPhotoBase64);
+
+          // أولاً: قراءة بيانات الكيس وتعبئة الخانات
+          await processCoffeeBagWithAI(rawCapturedBase64);
+          
+          // ثانياً: تحويل صورة الكيس إلى لقطة استوديو احترافية
+          await generateStudioShotWithAI(rawCapturedBase64);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    reScanAIBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (rawCapturedBase64) {
+        await processCoffeeBagWithAI(rawCapturedBase64);
+      } else {
+        coffeePhotoInput.click();
+      }
+    });
+
+    if (generateStudioBtn) {
+      generateStudioBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (rawCapturedBase64) {
+          await generateStudioShotWithAI(rawCapturedBase64);
+        }
+      });
+    }
+
+    removePhotoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentPhotoBase64 = '';
+      rawCapturedBase64 = '';
+      coffeePhotoInput.value = '';
+      displayPhotoPreview('');
+    });
+
+    function displayPhotoPreview(src) {
+      if (src) {
+        photoPreviewImg.src = src;
+        photoPreviewImg.classList.remove('hidden');
+        photoPlaceholder.classList.add('hidden');
+        removePhotoBtn.classList.remove('hidden');
+        reScanAIBtn.classList.remove('hidden');
+        if (generateStudioBtn) generateStudioBtn.classList.remove('hidden');
+      } else {
+        photoPreviewImg.src = '';
+        photoPreviewImg.classList.add('hidden');
+        photoPlaceholder.classList.remove('hidden');
+        removePhotoBtn.classList.add('hidden');
+        reScanAIBtn.classList.add('hidden');
+        if (generateStudioBtn) generateStudioBtn.classList.add('hidden');
+      }
+    }
+
+    async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, options);
+          if (response.ok) return response;
+        } catch (e) {
+          // Retry logic
+        }
+        await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+      }
+      return fetch(url, options);
+    }
+
+    /* 1. قراءة بيانات كيس القهوة وتعبئة الخانات تلقائياً */
+    async function processCoffeeBagWithAI(base64Image) {
+      aiProcessingOverlay.classList.remove('hidden');
+      if (aiProgressText) aiProgressText.textContent = 'جاري قراءة تفاصيل الكيس وتعبئة الخانات...';
+      if (aiSubProgressText) aiSubProgressText.textContent = 'يتم استخراج المحمصة، المحصول، المنشأ، المعالجة والإيحاءات';
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const promptText = `أنت خبير قراءة أكياس القهوة المختصة (Specialty Coffee Bag OCR).
+المهمة: اقرأ صورة كيس القهوة المرفقة واستخرج جميع البيانات المكتوبة عليها باللغتين العربية أو الإنجليزية بدقة عالية، وضع النتيجة في كائن JSON:
+1. roaster: اسم المحمصة (مثل: كاب، كفة، هجين، خطوة جمل، صواع، أكتوبر، إلخ).
+2. name: اسم محصول البن أو المنطقة أو المزرعة المكتوبة بشكل بارز (مثل: قيشا، يرقاتشيف، شلشلي، إلخ).
+3. country: بلد المنشأ (مثل: إثيوبيا، كولومبيا، اليمن، كوستاريكا، غواتيمالا، السلفادور، البرازيل، كينيا، بنما، إلخ).
+4. process: طريقة المعالجة بدقة (مجففة Natural، مغسولة Washed، عسلية Honey، تخمير لا هوائي Anaerobic...).
+5. roast: درجة الحمص إن وجدت (فاتح Light، متوسط-فاتح Medium-Light، متوسط Medium، غامق Dark).
+6. brewMethod: أداة التحضير الأنسب حسب المكتوب (V60، Espresso، Aeropress، Chemex، Cold Brew).
+7. tasteNotes: مصفوفة بالإيحاءات والنكهات المكتوبة بدقة (مثل: خوخ، ياسمين، شوكولاتة، توت، عسل، إلخ).
+8. briefVerdict: ملخص سريع من سطر واحد يصف نكهة هذا المحصول.`;
+
+        const payload = {
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: promptText },
+                {
+                  inlineData: {
+                    mimeType: "image/jpeg",
+                    data: base64Image
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                roaster: { type: "STRING" },
+                name: { type: "STRING" },
+                country: { type: "STRING" },
+                process: { type: "STRING" },
+                roast: { type: "STRING" },
+                brewMethod: { type: "STRING" },
+                tasteNotes: {
+                  type: "ARRAY",
+                  items: { type: "STRING" }
+                },
+                briefVerdict: { type: "STRING" }
+              },
+              required: ["roaster", "name"]
+            }
+          }
+        };
+
+        const res = await fetchWithBackoff(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidate) {
+          const parsed = JSON.parse(candidate);
+          applyCoffeeDataToForm(parsed);
+          showToast('تمت قراءة وتعبئة جميع بيانات الكيس بنجاح!');
+        }
+      } catch (err) {
+        console.error("AI OCR error:", err);
+        showToast('تم حفظ الصورة، يمكنك إكمال بقية الخانات يدوياً', true);
+      } finally {
+        // إذا لم يكن جاري تحويل الاستوديو نخفي شاشة التحميل
+        if (!generateStudioBtn || !generateStudioBtn.dataset.busy) {
+          aiProcessingOverlay.classList.add('hidden');
+        }
+      }
+    }
+
+    /* 2. تحويل صورة الكيس إلى لقطة استوديو إعلانية فاخرة بالذكاء الاصطناعي */
+    async function generateStudioShotWithAI(base64Image) {
+      if (!generateStudioBtn) return;
+      generateStudioBtn.dataset.busy = "true";
+      aiProcessingOverlay.classList.remove('hidden');
+      if (aiProgressText) aiProgressText.textContent = 'جاري تحسين الصورة وصنع لقطة استوديو فاخرة...';
+      if (aiSubProgressText) aiSubProgressText.textContent = 'إضاءة سينمائية، خلفية استوديو ناعمة وتنسيق كيس القهوة';
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+        const promptText = `Professional commercial studio product photography of this exact coffee bean bag. 
+Place this specialty coffee bag standing upright centered on a warm matte stone pedestal, luxury warm ambient coffee shop studio lighting, soft natural diffused rim shadows, clean minimalist cafe background with scattered roasted coffee beans, cinematic 8k resolution advertising shot, elegant and clean composition.`;
+
+        const payload = {
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: promptText },
+                {
+                  inlineData: {
+                    mimeType: "image/jpeg",
+                    data: base64Image
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseModalities: ['TEXT', 'IMAGE']
+          }
+        };
+
+        const res = await fetchWithBackoff(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        const imagePart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+        if (imagePart && imagePart.inlineData?.data) {
+          const studioDataUrl = `data:${imagePart.inlineData.mimeType || 'image/png'};base64,${imagePart.inlineData.data}`;
+          currentPhotoBase64 = studioDataUrl;
+          displayPhotoPreview(currentPhotoBase64);
+          showToast('تمت ترقية الصورة إلى لقطة استوديو احترافية!');
+        }
+      } catch (err) {
+        console.warn("Studio generation skipped or failed:", err);
+      } finally {
+        generateStudioBtn.dataset.busy = "";
+        aiProcessingOverlay.classList.add('hidden');
+      }
+    }
+
+    function applyCoffeeDataToForm(info) {
+      if (info.name) coffeeNameInput.value = info.name;
+      if (info.roaster) roasterNameInput.value = info.roaster;
+      if (info.country) countryOriginInput.value = info.country;
+
+      if (info.process) {
+        const pLower = info.process.toLowerCase();
+        if (pLower.includes('مغسول') || pLower.includes('wash')) {
+          processingMethodInput.value = 'مغسولة (Washed)';
+        } else if (pLower.includes('عسل') || pLower.includes('honey')) {
+          processingMethodInput.value = 'عسلية (Honey)';
+        } else if (pLower.includes('لاهوائ') || pLower.includes('anaerob') || pLower.includes('تخمير')) {
+          processingMethodInput.value = 'تخمير لا هوائي (Anaerobic)';
+        } else if (pLower.includes('مجفف') || pLower.includes('natural')) {
+          processingMethodInput.value = 'مجففة (Natural)';
+        } else {
+          processingMethodInput.value = info.process;
+        }
+      }
+
+      if (info.brewMethod) {
+        const bLower = info.brewMethod.toLowerCase();
+        if (bLower.includes('espress') || bLower.includes('اسبريسو')) {
+          brewMethodInput.value = 'Espresso';
+        } else if (bLower.includes('aero') || bLower.includes('ايروبرس')) {
+          brewMethodInput.value = 'Aeropress';
+        } else if (bLower.includes('chemex') || bLower.includes('كيمكس')) {
+          brewMethodInput.value = 'Chemex';
+        } else if (bLower.includes('kalita') || bLower.includes('كاليتا')) {
+          brewMethodInput.value = 'Kalita Wave';
+        } else if (bLower.includes('cold') || bLower.includes('بارد')) {
+          brewMethodInput.value = 'Cold Brew';
+        } else {
+          brewMethodInput.value = 'V60';
+        }
+      }
+
+      if (info.roast) {
+        const rLower = info.roast.toLowerCase();
+        if (rLower.includes('فاتح') || rLower.includes('light')) {
+          roastLevelInput.value = 'فاتح (Light)';
+        } else if (rLower.includes('غامق') || rLower.includes('dark')) {
+          roastLevelInput.value = 'غامق (Dark)';
+        } else if (rLower.includes('متوسط-فاتح')) {
+          roastLevelInput.value = 'متوسط-فاتح (Medium-Light)';
+        } else {
+          roastLevelInput.value = 'متوسط (Medium)';
+        }
+      }
+
+      if (info.tasteNotes && Array.isArray(info.tasteNotes)) {
+        customTasteNotesInput.value = info.tasteNotes.join(', ');
+        noteChips.forEach(chip => {
+          const txt = chip.textContent.trim();
+          if (info.tasteNotes.some(n => n.includes(txt) || txt.includes(n))) {
+            chip.classList.add('bg-espresso-700', 'text-white');
+            chip.classList.remove('bg-stone-200/80', 'text-stone-700');
+          }
+        });
+      }
+
+      if (info.briefVerdict && !personalNotesInput.value) {
+        personalNotesInput.value = info.briefVerdict;
+      }
+    }
+
+    /* ----------------------------------------------------
+       STAR RATING COMPONENT
+    ---------------------------------------------------- */
+    const starBtns = document.querySelectorAll('.star-btn');
+    const starRatingLabel = document.getElementById('starRatingLabel');
+    const ratingLabels = {
+      1: 'مخيب للآمال (1/5)',
+      2: 'أقل من المتوقع (2/5)',
+      3: 'مقبول / متوسط (3/5)',
+      4: 'جيد جداً وممتع (4/5)',
+      5: 'استثنائي وفاخر (5/5)'
+    };
+
+    function setStarRating(val) {
+      ratingValueInput.value = val;
+      if (starRatingLabel) {
+        starRatingLabel.textContent = ratingLabels[val] || `${val}/5`;
+      }
+      starBtns.forEach(btn => {
+        const btnVal = parseInt(btn.dataset.val);
+        if (btnVal <= val) {
+          btn.classList.add('text-amber-400');
+          btn.classList.remove('text-stone-300', 'dark:text-stone-700');
+        } else {
+          btn.classList.remove('text-amber-400');
+          btn.classList.add('text-stone-300', 'dark:text-stone-700');
+        }
+      });
+    }
+
+    starBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setStarRating(parseInt(btn.dataset.val));
+      });
+    });
+
+    /* ----------------------------------------------------
+       TASTE NOTE QUICK CHIPS
+    ---------------------------------------------------- */
+    const noteChips = document.querySelectorAll('.note-chip');
+    noteChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const text = chip.textContent.trim();
+        let existing = customTasteNotesInput.value.split(',').map(s => s.trim()).filter(Boolean);
+        if (!existing.includes(text)) {
+          existing.push(text);
+          customTasteNotesInput.value = existing.join(', ');
+          chip.classList.add('bg-espresso-700', 'text-white');
+          chip.classList.remove('bg-stone-200/80', 'text-stone-700');
+        } else {
+          existing = existing.filter(x => x !== text);
+          customTasteNotesInput.value = existing.join(', ');
+          chip.classList.remove('bg-espresso-700', 'text-white');
+          chip.classList.add('bg-stone-200/80', 'text-stone-700');
+        }
+      });
+    });
+
+    /* ----------------------------------------------------
+       CAMERA AI SEARCH & BAG CHECKER
+    ---------------------------------------------------- */
+    const triggerSearchScannerBtn = document.getElementById('triggerSearchScannerBtn');
+    const searchScannerInput = document.getElementById('searchScannerInput');
+    const scannerResultModal = document.getElementById('scannerResultModal');
+    const scannerResultBody = document.getElementById('scannerResultBody');
+    const closeScannerResultBtn = document.getElementById('closeScannerResultBtn');
+
+    if (triggerSearchScannerBtn && searchScannerInput) {
+      triggerSearchScannerBtn.addEventListener('click', () => {
+        searchScannerInput.click();
+      });
+
+      searchScannerInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        showToast('جاري فحص كيس القهوة بالذكاء الاصطناعي...');
+
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+          const img = new Image();
+          img.onload = async function() {
+            const canvas = document.createElement('canvas');
+            const maxDim = 1000;
+            let width = img.width;
+            let height = img.height;
+            if (width > height && width > maxDim) {
+              height *= maxDim / width;
+              width = maxDim;
+            } else if (height > maxDim) {
+              width *= maxDim / height;
+              height = maxDim;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const base64Jpeg = canvas.toDataURL('image/jpeg', 0.85);
+            const rawBase64 = base64Jpeg.split(',')[1];
+
+            await analyzeBagForSearchMatch(rawBase64, base64Jpeg);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (closeScannerResultBtn) {
+      closeScannerResultBtn.addEventListener('click', () => {
+        scannerResultModal.classList.add('hidden');
+      });
+    }
+
+    async function analyzeBagForSearchMatch(base64Image, fullDataUrl) {
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const promptText = `أنت مساعد خبير بالقهوة المختصة. اقرأ هذا الكيس واستخرج في الـ JSON:
+1. roaster: اسم المحمصة.
+2. name: اسم المحصول.
+3. country: بلد المنشأ.
+4. process: المعالجة.
+5. roast: درجة الحمص.
+6. brewMethod: أداة التحضير الأنسب.
+7. tasteNotes: مصفوفة الإيحاءات المكتوبة.
+8. briefVerdict: جملة ملخصة عن المحصول.`;
+
+        const payload = {
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: promptText },
+                {
+                  inlineData: {
+                    mimeType: "image/jpeg",
+                    data: base64Image
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                roaster: { type: "STRING" },
+                name: { type: "STRING" },
+                country: { type: "STRING" },
+                process: { type: "STRING" },
+                roast: { type: "STRING" },
+                brewMethod: { type: "STRING" },
+                tasteNotes: {
+                  type: "ARRAY",
+                  items: { type: "STRING" }
+                },
+                briefVerdict: { type: "STRING" }
+              },
+              required: ["roaster", "name"]
+            }
+          }
+        };
+
+        const res = await fetchWithBackoff(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!candidate) {
+          showToast('تعذر التعرف على الكيس، حاول تصويره بإضاءة أفضل', true);
+          return;
+        }
+
+        const scannedBag = JSON.parse(candidate);
+
+        // ابحث في قاعدة بيانات المستخدم المخزنة
+        const matchedItem = coffees.find(c => {
+          const nameMatch = c.name && scannedBag.name && 
+            (c.name.toLowerCase().includes(scannedBag.name.toLowerCase()) || scannedBag.name.toLowerCase().includes(c.name.toLowerCase()));
+          const roasterMatch = c.roaster && scannedBag.roaster &&
+            (c.roaster.toLowerCase().includes(scannedBag.roaster.toLowerCase()) || scannedBag.roaster.toLowerCase().includes(c.roaster.toLowerCase()));
+          return nameMatch || (nameMatch && roasterMatch);
+        });
+
+        renderScannerResult(scannedBag, matchedItem, fullDataUrl, base64Image);
+
+      } catch (err) {
+        console.error('Scanner Error:', err);
+        showToast('حدث خطأ أثناء فحص الكيس، يمكنك البحث يدوياً', true);
+      }
+    }
+
+    function renderScannerResult(scannedBag, matchedItem, fullDataUrl, rawBase64) {
+      if (matchedItem) {
+        const decisionBadge = matchedItem.buyAgain === 'yes' 
+          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center gap-1"><i class="ph-bold ph-check"></i> نعم، تحبه وتشتريه مجدداً!</span>`
+          : matchedItem.buyAgain === 'no'
+          ? `<span class="px-2.5 py-1 rounded-full bg-rose-500 text-white font-bold text-xs flex items-center gap-1"><i class="ph-bold ph-x"></i> انتبه! مسجل عندك: لا تشتريه ثانية</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center gap-1"><i class="ph-bold ph-scales"></i> تجربتك السابقة كانت عادية</span>`;
+
+        scannerResultBody.innerHTML = `
+          <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-amber-900 dark:text-amber-300">تم التعرف على الكيس بنجاح</span>
+              ${decisionBadge}
+            </div>
+            <h4 class="text-base font-black text-stone-900 dark:text-white">${matchedItem.name}</h4>
+            <p class="text-xs text-stone-600 dark:text-stone-300">المحمصة: <span class="font-bold">${matchedItem.roaster}</span> • المنشأ: ${matchedItem.country || 'غير محدد'}</p>
+            <div class="flex items-center gap-2 text-xs pt-1">
+              <span class="text-amber-400 font-bold">${'★'.repeat(matchedItem.rating)}</span>
+              <span class="text-stone-500 text-[11px]">تقييمك السابق (${matchedItem.rating}/5)</span>
+            </div>
+            ${matchedItem.notes ? `
+              <div class="p-2.5 bg-white dark:bg-stone-900 rounded-xl text-[11px] text-stone-700 dark:text-stone-300 mt-2 border border-stone-200 dark:border-stone-800">
+                <span class="font-bold block text-stone-900 dark:text-stone-100 mb-0.5">ملاحظتك السابقة:</span>
+                ${matchedItem.notes}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="flex items-center gap-2 pt-2">
+            <button id="viewScannedDetailBtn" class="flex-1 py-2.5 rounded-xl bg-espresso-800 dark:bg-espresso-600 text-white font-bold text-xs">
+              عرض كامل التفاصيل في سجلك
+            </button>
+            <button id="closeScannedResultSubBtn" class="px-4 py-2.5 rounded-xl bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs">
+              تم
+            </button>
+          </div>
+        `;
+
+        setTimeout(() => {
+          document.getElementById('viewScannedDetailBtn')?.addEventListener('click', () => {
+            scannerResultModal.classList.add('hidden');
+            openDetailView(matchedItem.id);
+          });
+          document.getElementById('closeScannedResultSubBtn')?.addEventListener('click', () => {
+            scannerResultModal.classList.add('hidden');
+          });
+        }, 50);
+
+      } else {
+        scannerResultBody.innerHTML = `
+          <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-2xl space-y-2">
+            <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-xs">
+              <i class="ph-bold ph-sparkle text-lg"></i>
+              <span>محصول جديد كلياً! لم تجربه من قبل في سجلك</span>
+            </div>
+            <h4 class="text-base font-black text-stone-900 dark:text-white">${scannedBag.name || 'محصول جديد'}</h4>
+            <p class="text-xs text-stone-600 dark:text-stone-300">المحمصة: <span class="font-bold">${scannedBag.roaster || 'غير محدد'}</span> • الدولة: ${scannedBag.country || 'غير محدد'}</p>
+            ${scannedBag.tasteNotes && scannedBag.tasteNotes.length ? `
+              <p class="text-[11px] text-stone-500">الإيحاءات المكتوبة: ${scannedBag.tasteNotes.join('، ')}</p>
+            ` : ''}
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button id="addScannedBagNowBtn" class="w-full py-2.5 rounded-xl bg-espresso-800 dark:bg-espresso-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+              <i class="ph-bold ph-plus-circle text-base"></i>
+              إضافة هذا المحصول الآن إلى سجلك
+            </button>
+            <button id="cancelScannedBagBtn" class="w-full py-2 rounded-xl text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 font-bold text-xs">
+              إلغاء
+            </button>
+          </div>
+        `;
+
+        setTimeout(() => {
+          document.getElementById('addScannedBagNowBtn')?.addEventListener('click', () => {
+            scannerResultModal.classList.add('hidden');
+            openAddModal();
+            applyCoffeeDataToForm(scannedBag);
+            currentPhotoBase64 = fullDataUrl;
+            rawCapturedBase64 = rawBase64;
+            displayPhotoPreview(currentPhotoBase64);
+            showToast('تمت تعبئة بيانات المحصول، أكمل تقييمك واحفظه!');
+          });
+          document.getElementById('cancelScannedBagBtn')?.addEventListener('click', () => {
+            scannerResultModal.classList.add('hidden');
+          });
+        }, 50);
+      }
+
+      scannerResultModal.classList.remove('hidden');
+    }
+
+    /* ----------------------------------------------------
+       FILTER & IN-SHOP DUPLICATE CHECKER (SEARCH LOGIC)
+    ---------------------------------------------------- */
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      clearSearchBtn.classList.toggle('hidden', searchQuery.length === 0);
+      checkInShopDuplicateMatch(searchQuery);
+      renderFeed();
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      clearSearchBtn.classList.add('hidden');
+      matchAlertBanner.classList.add('hidden');
+      renderFeed();
+    });
+
+    function checkInShopDuplicateMatch(query) {
+      if (query.length < 3) {
+        matchAlertBanner.classList.add('hidden');
+        return;
+      }
+
+      const match = coffees.find(c => 
+        (c.name && c.name.toLowerCase().includes(query)) || 
+        (c.roaster && c.roaster.toLowerCase().includes(query))
+      );
+
+      if (match) {
+        matchAlertBanner.classList.remove('hidden');
+        let decisionText = match.buyAgain === 'yes' ? 'أنت تحبه ومسجل عندك: (نعم تشتريه مجدداً) ★ ' + match.rating :
+                           match.buyAgain === 'no' ? 'انتبه! مسجل عندك: (لا تشتريه أبداً) ★ ' + match.rating :
+                           'مسجل بتقييم عادي ★ ' + match.rating;
+        matchAlertTitle.textContent = `فحص الكيس: وجدنا "${match.name}" من ${match.roaster}`;
+        matchAlertDesc.textContent = decisionText;
+      } else {
+        matchAlertBanner.classList.add('hidden');
+      }
+    }
+
+    const filterChips = document.querySelectorAll('.filter-chip');
+    filterChips.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('active', 'bg-espresso-800', 'text-white', 'dark:bg-espresso-600');
+          c.classList.add('bg-stone-200/80', 'dark:bg-stone-800', 'text-stone-600', 'dark:text-stone-300');
+        });
+        btn.classList.add('active', 'bg-espresso-800', 'text-white', 'dark:bg-espresso-600');
+        btn.classList.remove('bg-stone-200/80', 'dark:bg-stone-800', 'text-stone-600', 'dark:text-stone-300');
+        currentFilter = btn.dataset.filter;
+        renderFeed();
+      });
+    });
+
+    /* ----------------------------------------------------
+       RENDER LOGIC (FEED & CARDS)
+    ---------------------------------------------------- */
+    function renderFeed() {
+      feedGrid.innerHTML = '';
+
+      let filtered = coffees.filter(c => {
+        const matchesSearch = 
+          (c.name && c.name.toLowerCase().includes(searchQuery)) ||
+          (c.roaster && c.roaster.toLowerCase().includes(searchQuery)) ||
+          (c.country && c.country.toLowerCase().includes(searchQuery)) ||
+          (c.tasteNotes && c.tasteNotes.some(n => n.toLowerCase().includes(searchQuery)));
+
+        if (!matchesSearch) return false;
+
+        if (currentFilter === 'buy-again') return c.buyAgain === 'yes';
+        if (currentFilter === 'do-not-buy') return c.buyAgain === 'no';
+        if (currentFilter === 'top-rated') return c.rating === 5;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        emptyFeedState.classList.remove('hidden');
+      } else {
+        emptyFeedState.classList.add('hidden');
+        filtered.forEach(item => {
+          feedGrid.appendChild(createCoffeeCard(item));
+        });
+      }
+    }
+
+    function createCoffeeCard(item) {
+      const card = document.createElement('div');
+      card.className = "bg-white dark:bg-stone-900 rounded-3xl p-3.5 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md transition active:scale-[0.99] cursor-pointer flex gap-3.5 items-stretch";
+      
+      const imageMarkup = item.photoData 
+        ? `<div class="w-24 h-28 rounded-2xl overflow-hidden shrink-0 shadow-inner relative">
+             <img src="${item.photoData}" alt="${item.name}" class="w-full h-full object-cover" />
+           </div>`
+        : `<div class="w-24 h-28 rounded-2xl bg-gradient-to-tr from-espresso-100 to-amber-50 dark:from-stone-800 dark:to-stone-900 flex flex-col items-center justify-center text-espresso-700 dark:text-espresso-400 shrink-0 border border-espresso-200/60 dark:border-stone-700">
+             <i class="ph-duotone ph-coffee-bean text-2xl mb-1 text-espresso-600 dark:text-amber-400"></i>
+             <span class="text-[10px] font-bold text-center px-1 text-stone-600 dark:text-stone-300">${item.country || 'بن مختص'}</span>
+           </div>`;
+
+      let badgeHtml = '';
+      if (item.buyAgain === 'yes') {
+        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-50 text-iosGreen dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800">
+          <i class="ph-bold ph-check"></i> أشتريه مجدداً
+        </span>`;
+      } else if (item.buyAgain === 'no') {
+        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-iosRed dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800">
+          <i class="ph-bold ph-x"></i> لا تكرر الشراء
+        </span>`;
+      } else {
+        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/60">
+          <i class="ph-bold ph-scales"></i> عادي
+        </span>`;
+      }
+
+      const starsHtml = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
+
+      const notesPills = (item.tasteNotes || []).slice(0, 3).map(n => 
+        `<span class="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2 py-0.5 rounded-md font-medium">${n}</span>`
+      ).join('');
+
+      card.innerHTML = `
+        ${imageMarkup}
+        <div class="flex-1 flex flex-col justify-between overflow-hidden">
+          <div>
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] font-bold text-espresso-700 dark:text-amber-400 truncate max-w-[120px]">${item.roaster}</span>
+              ${badgeHtml}
+            </div>
+            <h3 class="font-extrabold text-sm text-stone-900 dark:text-white leading-tight truncate">${item.name}</h3>
+            <p class="text-[11px] text-stone-500 mt-0.5">${item.country ? item.country + ' • ' : ''}${item.process || ''}</p>
+          </div>
+
+          <div class="pt-2">
+            <div class="flex flex-wrap gap-1 mb-1.5 overflow-hidden max-h-6">
+              ${notesPills}
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-amber-400 font-bold tracking-widest text-xs">${starsHtml}</span>
+              <span class="text-stone-400 text-[10px] flex items-center gap-1">
+                <i class="ph-bold ph-cooking-pot"></i>
+                ${item.brewMethod || 'V60'}
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => openDetailView(item.id));
+      return card;
+    }
+
+    /* ----------------------------------------------------
+       RENDER WISHLIST & ENHANCED STATS
+    ---------------------------------------------------- */
+    function renderWishlist() {
+      wishlistContainer.innerHTML = '';
+      const buyAgainItems = coffees.filter(c => c.buyAgain === 'yes');
+
+      if (buyAgainItems.length === 0) {
+        emptyWishlistState.classList.remove('hidden');
+      } else {
+        emptyWishlistState.classList.add('hidden');
+        buyAgainItems.forEach(item => {
+          wishlistContainer.appendChild(createCoffeeCard(item));
+        });
+      }
+    }
+
+    function renderStats() {
+      const total = coffees.length;
+      document.getElementById('statTotalBags').textContent = total;
+
+      if (total === 0) {
+        document.getElementById('statBuyAgainPct').textContent = '0%';
+        document.getElementById('statAvgRating').textContent = '0.0';
+        document.getElementById('statOriginsBars').innerHTML = '<p class="text-xs text-stone-400 text-center py-2">لا توجد محاصيل مضافة بعد</p>';
+        document.getElementById('statProcessBars').innerHTML = '<p class="text-xs text-stone-400 text-center py-2">لا توجد معالجات مضافة بعد</p>';
+        document.getElementById('statRoastersList').innerHTML = '<p class="text-xs text-stone-400 text-center py-2">لا توجد محامص مسجلة</p>';
+        return;
+      }
+
+      const buyAgainCount = coffees.filter(c => c.buyAgain === 'yes').length;
+      const pct = Math.round((buyAgainCount / total) * 100);
+      document.getElementById('statBuyAgainPct').textContent = `${pct}%`;
+
+      const avgRating = (coffees.reduce((acc, c) => acc + (c.rating || 0), 0) / total).toFixed(1);
+      document.getElementById('statAvgRating').textContent = avgRating;
+
+      // Countries
+      const countryCounts = {};
+      coffees.forEach(c => {
+        const ct = c.country || 'غير محدد';
+        countryCounts[ct] = (countryCounts[ct] || 0) + 1;
+      });
+      const sortedCountries = Object.entries(countryCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+      const originsContainer = document.getElementById('statOriginsBars');
+      originsContainer.innerHTML = sortedCountries.map(([ctry, count]) => {
+        const barPct = Math.round((count / total) * 100);
+        return `
+          <div>
+            <div class="flex justify-between text-[11px] mb-1">
+              <span class="font-bold text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
+                <i class="ph-bold ph-globe text-amber-600"></i> ${ctry}
+              </span>
+              <span class="text-stone-400 font-medium">${count} أكياس (${barPct}%)</span>
+            </div>
+            <div class="w-full bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-l from-espresso-600 to-amber-500 h-full rounded-full transition-all duration-500" style="width: ${barPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Processing Methods
+      const processCounts = {};
+      coffees.forEach(c => {
+        const pr = c.process ? c.process.split(' ')[0] : 'غير محدد';
+        processCounts[pr] = (processCounts[pr] || 0) + 1;
+      });
+      const sortedProcesses = Object.entries(processCounts).sort((a,b) => b[1] - a[1]);
+      const processContainer = document.getElementById('statProcessBars');
+      processContainer.innerHTML = sortedProcesses.map(([pr, count]) => {
+        const barPct = Math.round((count / total) * 100);
+        return `
+          <div>
+            <div class="flex justify-between text-[11px] mb-1">
+              <span class="font-bold text-stone-700 dark:text-stone-300">${pr}</span>
+              <span class="text-stone-400 font-medium">${count} أكياس (${barPct}%)</span>
+            </div>
+            <div class="w-full bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-l from-emerald-600 to-teal-400 h-full rounded-full transition-all duration-500" style="width: ${barPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Roaster Tags
+      const roasters = [...new Set(coffees.map(c => c.roaster))].filter(Boolean);
+      const roastersList = document.getElementById('statRoastersList');
+      roastersList.innerHTML = roasters.map(r => 
+        `<span class="px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/50 text-espresso-900 dark:text-amber-300 text-[11px] font-bold shadow-sm">${r}</span>`
+      ).join('');
+    }
+
+    function updateBadgeCounts() {
+      countAll.textContent = coffees.length;
+      countBuy.textContent = coffees.filter(c => c.buyAgain === 'yes').length;
+      countAvoid.textContent = coffees.filter(c => c.buyAgain === 'no').length;
+    }
+
+    function renderAll() {
+      updateBadgeCounts();
+      renderFeed();
+      renderWishlist();
+      renderStats();
+    }
+
+    /* ----------------------------------------------------
+       DETAIL MODAL
+    ---------------------------------------------------- */
+    function openDetailView(id) {
+      const item = coffees.find(c => c.id === id);
+      if (!item) return;
+
+      currentActiveId = id;
+      const detailContent = document.getElementById('detailContent');
+
+      let decisionColor = item.buyAgain === 'yes' ? 'bg-emerald-500' : item.buyAgain === 'no' ? 'bg-rose-500' : 'bg-amber-500';
+      let decisionText = item.buyAgain === 'yes' ? 'نعم - أشتريه مجدداً بدون تردد' : item.buyAgain === 'no' ? 'لا تكرر الشراء نهائياً' : 'متردد / تجربة عادية';
+
+      detailContent.innerHTML = `
+        ${item.photoData ? `
+          <div class="relative rounded-2xl overflow-hidden shadow-sm mb-3">
+            <img src="${item.photoData}" class="w-full h-64 object-cover" alt="${item.name}" />
+          </div>` : ''}
+
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-espresso-700 dark:text-amber-400">${item.roaster}</span>
+          <h2 class="text-xl font-black text-stone-900 dark:text-white">${item.name}</h2>
+          <div class="flex items-center gap-1 text-amber-400 text-lg">
+            ${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}
+            <span class="text-xs text-stone-400 mr-2 font-mono">(${item.rating}/5)</span>
+          </div>
+        </div>
+
+        <!-- Decision Box -->
+        <div class="p-3.5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 flex items-center gap-3">
+          <div class="w-3.5 h-3.5 rounded-full ${decisionColor} shrink-0"></div>
+          <div>
+            <p class="text-[10px] text-stone-400 font-semibold">القرار المستقبلي في المحمصة</p>
+            <p class="text-xs font-black text-stone-900 dark:text-white">${decisionText}</p>
+          </div>
+        </div>
+
+        <!-- Specs Grid -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/60">
+            <span class="text-stone-400 block text-[10px]">المنشأ / الدولة</span>
+            <span class="font-bold text-stone-800 dark:text-stone-200">${item.country || 'غير محدد'}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/60">
+            <span class="text-stone-400 block text-[10px]">المعالجة</span>
+            <span class="font-bold text-stone-800 dark:text-stone-200">${item.process || 'غير محدد'}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/60">
+            <span class="text-stone-400 block text-[10px]">درجة الحمص</span>
+            <span class="font-bold text-stone-800 dark:text-stone-200">${item.roast || 'متوسط'}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/60">
+            <span class="text-stone-400 block text-[10px]">طريقة التحضير</span>
+            <span class="font-bold text-stone-800 dark:text-stone-200">${item.brewMethod || 'V60'}</span>
+          </div>
+        </div>
+
+        <!-- Taste Notes -->
+        ${item.tasteNotes && item.tasteNotes.length > 0 ? `
+          <div class="space-y-1.5">
+            <h4 class="text-xs font-bold text-stone-700 dark:text-stone-300">الإيحاءات المسجلة:</h4>
+            <div class="flex flex-wrap gap-1.5">
+              ${item.tasteNotes.map(n => `<span class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-bold text-xs border border-amber-200 dark:border-amber-800/50">${n}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Honest Notes -->
+        ${item.notes ? `
+          <div class="space-y-1 pt-1">
+            <h4 class="text-xs font-bold text-stone-700 dark:text-stone-300">ملاحظات التذوق ورأيك النهائي:</h4>
+            <div class="p-3 bg-stone-100/80 dark:bg-stone-800/50 rounded-2xl text-xs text-stone-700 dark:text-stone-300 leading-relaxed border border-stone-200/50 dark:border-stone-800">
+              ${item.notes}
+            </div>
+          </div>
+        ` : ''}
+      `;
+
+      detailModal.classList.remove('hidden');
+    }
+
+    document.getElementById('closeDetailBtn').addEventListener('click', () => {
+      detailModal.classList.add('hidden');
+    });
+
+    document.getElementById('editDetailBtn').addEventListener('click', () => {
+      detailModal.classList.add('hidden');
+      openEditModal(currentActiveId);
+    });
+
+    document.getElementById('deleteDetailBtn').addEventListener('click', () => {
+      if (window.confirm('هل أنت متأكد من حذف هذا المحصول من سجلك؟')) {
+        coffees = coffees.filter(c => c.id !== currentActiveId);
+        saveData();
+        detailModal.classList.add('hidden');
+        showToast('تم حذف المحصول بنجاح');
+      }
+    });
+
+    /* ----------------------------------------------------
+       ADD / EDIT FORM MODAL LOGIC
+    ---------------------------------------------------- */
+    function openAddModal() {
+      coffeeForm.reset();
+      coffeeIdInput.value = '';
+      currentPhotoBase64 = '';
+      rawCapturedBase64 = '';
+      displayPhotoPreview('');
+      setStarRating(5);
+      
+      noteChips.forEach(c => {
+        c.classList.remove('bg-espresso-700', 'text-white');
+        c.classList.add('bg-stone-200/80', 'text-stone-700');
+      });
+
+      document.querySelector('input[name="buyAgainDecision"][value="yes"]').checked = true;
+      document.getElementById('modalTitle').textContent = 'إضافة محصول جديد بالذكاء الاصطناعي';
+      entryModal.classList.remove('hidden');
+    }
+
+    function openEditModal(id) {
+      const item = coffees.find(c => c.id === id);
+      if (!item) return;
+
+      coffeeIdInput.value = item.id;
+      coffeeNameInput.value = item.name;
+      roasterNameInput.value = item.roaster;
+      countryOriginInput.value = item.country || '';
+      processingMethodInput.value = item.process || 'مجففة (Natural)';
+      roastLevelInput.value = item.roast || 'فاتح (Light)';
+      brewMethodInput.value = item.brewMethod || 'V60';
+      customTasteNotesInput.value = (item.tasteNotes || []).join(', ');
+      personalNotesInput.value = item.notes || '';
+      
+      const radio = document.querySelector(`input[name="buyAgainDecision"][value="${item.buyAgain}"]`);
+      if (radio) radio.checked = true;
+
+      setStarRating(item.rating || 5);
+
+      currentPhotoBase64 = item.photoData || '';
+      rawCapturedBase64 = '';
+      displayPhotoPreview(currentPhotoBase64);
+
+      noteChips.forEach(chip => {
+        const text = chip.textContent.trim();
+        if (item.tasteNotes && item.tasteNotes.includes(text)) {
+          chip.classList.add('bg-espresso-700', 'text-white');
+          chip.classList.remove('bg-stone-200/80', 'text-stone-700');
+        } else {
+          chip.classList.remove('bg-espresso-700', 'text-white');
+          chip.classList.add('bg-stone-200/80', 'text-stone-700');
+        }
+      });
+
+      document.getElementById('modalTitle').textContent = 'تعديل المحصول';
+      entryModal.classList.remove('hidden');
+    }
+
+    // Modal Triggers
+    document.getElementById('centerAddBtn').addEventListener('click', openAddModal);
+    if (emptyStateAddBtn) emptyStateAddBtn.addEventListener('click', openAddModal);
+    
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      entryModal.classList.add('hidden');
+    });
+
+    document.getElementById('saveCoffeeBtn').addEventListener('click', () => {
+      const name = coffeeNameInput.value.trim();
+      const roaster = roasterNameInput.value.trim();
+
+      if (!name || !roaster) {
+        showToast('يرجى تصوير الكيس أو كتابة اسم البن واسم المحمصة', true);
+        return;
+      }
+
+      const tasteNotes = customTasteNotesInput.value
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+
+      const decision = document.querySelector('input[name="buyAgainDecision"]:checked')?.value || 'yes';
+      const existingId = coffeeIdInput.value;
+
+      if (existingId) {
+        const idx = coffees.findIndex(c => c.id === existingId);
+        if (idx !== -1) {
+          coffees[idx] = {
+            ...coffees[idx],
+            name,
+            roaster,
+            country: countryOriginInput.value.trim(),
+            process: processingMethodInput.value,
+            roast: roastLevelInput.value,
+            brewMethod: brewMethodInput.value,
+            tasteNotes,
+            rating: parseInt(ratingValueInput.value) || 5,
+            buyAgain: decision,
+            notes: personalNotesInput.value.trim(),
+            photoData: currentPhotoBase64
+          };
+        }
+      } else {
+        const newCoffee = {
+          id: 'coffee_' + Date.now(),
+          name,
+          roaster,
+          country: countryOriginInput.value.trim(),
+          process: processingMethodInput.value,
+          roast: roastLevelInput.value,
+          brewMethod: brewMethodInput.value,
+          tasteNotes,
+          rating: parseInt(ratingValueInput.value) || 5,
+          buyAgain: decision,
+          notes: personalNotesInput.value.trim(),
+          dateAdded: new Date().toISOString(),
+          photoData: currentPhotoBase64
+        };
+        coffees.unshift(newCoffee);
+      }
+
+      saveData();
+      entryModal.classList.add('hidden');
+      showToast('تم حفظ تفاصيل المحصول بنجاح!');
+    });
+
+    /* ----------------------------------------------------
+       TABS NAVIGATION
+    ---------------------------------------------------- */
+    const tabBtns = document.querySelectorAll('.tab-nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    function switchTab(tabId) {
+      tabContents.forEach(c => c.classList.add('hidden'));
+      const activeContent = document.getElementById(tabId);
+      if (activeContent) activeContent.classList.remove('hidden');
+
+      tabBtns.forEach(btn => {
+        const icon = btn.querySelector('i');
+        if (btn.dataset.tab === tabId) {
+          btn.classList.add('text-espresso-800', 'dark:text-amber-400');
+          btn.classList.remove('text-stone-400', 'dark:text-stone-500');
+          if (icon) icon.className = icon.className.replace('ph-bold', 'ph-fill');
+        } else {
+          btn.classList.remove('text-espresso-800', 'dark:text-amber-400');
+          btn.classList.add('text-stone-400', 'dark:text-stone-500');
+          if (icon) icon.className = icon.className.replace('ph-fill', 'ph-bold');
+        }
+      });
+
+      if (tabId === 'tab-stats') renderStats();
+      if (tabId === 'tab-wishlist') renderWishlist();
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    /* ----------------------------------------------------
+       BACKUP & EXPORT / IMPORT
+    ---------------------------------------------------- */
+    const backupModalBtn = document.getElementById('backupModalBtn');
+    const closeBackupModalBtn = document.getElementById('closeBackupModalBtn');
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const importJsonInput = document.getElementById('importJsonInput');
+
+    backupModalBtn.addEventListener('click', () => backupModal.classList.remove('hidden'));
+    closeBackupModalBtn.addEventListener('click', () => backupModal.classList.add('hidden'));
+
+    exportJsonBtn.addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(coffees, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Coffee_Journal_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('تم تحميل ملف النسخة الاحتياطية بنجاح');
+    });
+
+    importJsonInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (Array.isArray(parsed)) {
+            coffees = parsed;
+            saveData();
+            backupModal.classList.add('hidden');
+            showToast(`تم استيراد ${parsed.length} محصول قهوة بنجاح!`);
+          } else {
+            showToast('الملف غير متوافق', true);
+          }
+        } catch (err) {
+          showToast('فشل في قراءة ملف JSON', true);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    /* ----------------------------------------------------
+       DARK / LIGHT MODE TOGGLE
+    ---------------------------------------------------- */
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    themeToggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('coffee_journal_theme', isDark ? 'dark' : 'light');
+    });
+
+    if (localStorage.getItem('coffee_journal_theme') === 'dark' || 
+       (!('coffee_journal_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    /* ----------------------------------------------------
+       TOAST HELPER
+    ---------------------------------------------------- */
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.textContent = message;
+      if (isError) {
+        toastIcon.className = "ph-bold ph-warning-circle text-iosRed";
+      } else {
+        toastIcon.className = "ph-bold ph-check text-iosGreen";
+      }
+
+      toast.classList.remove('opacity-0', '-translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-2');
+      }, 2600);
+    }
+
+    /* ----------------------------------------------------
+       INIT ON LOAD
+    ---------------------------------------------------- */
+    window.onload = function() {
+      loadData();
+      renderAll();
+    };
+  </script>
+</body>
+</html>
