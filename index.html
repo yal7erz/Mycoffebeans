@@ -78,6 +78,9 @@
         <button id="backupModalBtn" aria-label="النسخ الاحتياطي" class="w-9 h-9 rounded-full flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-800 transition active:scale-95">
           <i class="ph-bold ph-cloud-arrow-up text-lg"></i>
         </button>
+        <a id="adminLinkBtn" href="admin.html" aria-label="لوحة الإدارة" class="hidden w-9 h-9 rounded-full flex items-center justify-center text-iosPurple hover:bg-stone-200/60 dark:hover:bg-stone-800 transition active:scale-95">
+          <i class="ph-bold ph-shield-check text-lg"></i>
+        </a>
         <button id="logoutBtn" aria-label="تسجيل الخروج" class="w-9 h-9 rounded-full flex items-center justify-center text-iosRed hover:bg-rose-100/60 dark:hover:bg-stone-800 transition active:scale-95">
           <i class="ph-bold ph-sign-out text-lg"></i>
         </button>
@@ -87,6 +90,8 @@
 
   <!-- ================= MAIN ================= -->
   <main class="flex-1 overflow-y-auto hide-scrollbar max-w-md w-full mx-auto px-4 pb-28 pt-3">
+
+    <div id="announcementBar" class="hidden"></div>
 
     <div id="offlineIndicator" class="hidden mb-3 p-2.5 bg-stone-800 text-stone-200 rounded-2xl flex items-center justify-between text-xs shadow-sm">
       <div class="flex items-center gap-2">
@@ -466,7 +471,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, deleteDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, deleteDoc, onSnapshot, writeBatch, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     /* ---------- CONFIG ---------- */
     const firebaseConfig = {
@@ -493,6 +498,8 @@
     let coffees = [];
     let currentUser = null;
     let unsubscribe = null;
+    let unsubProfile = null;
+    let unsubSite = null;
     let currentFilter = 'all';
     let searchQuery = '';
     let currentActiveId = null;
@@ -596,8 +603,29 @@
     onAuthStateChanged(auth, user => {
       currentUser = user;
       if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      if (unsubProfile) { unsubProfile(); unsubProfile = null; }
+      if (unsubSite) { unsubSite(); unsubSite = null; }
       if (user) {
         $('loginModal').classList.add('hidden');
+        // ملف المستخدم الذي تراه لوحة الإدارة
+        setDoc(doc(db, 'users', user.uid), {
+          email: user.email || '',
+          createdAt: user.metadata.creationTime || '',
+          lastLoginAt: serverTimestamp()
+        }, { merge: true }).catch(() => {});
+        // إيقاف الحساب من الإدارة
+        unsubProfile = onSnapshot(doc(db, 'users', user.uid), s => {
+          if (s.exists() && s.data().disabled) {
+            window.alert('تم إيقاف هذا الحساب من قبل الإدارة.');
+            signOut(auth);
+          }
+        }, () => {});
+        // زر لوحة الإدارة يظهر للأدمن فقط
+        getDoc(doc(db, 'admins', user.uid))
+          .then(s => $('adminLinkBtn').classList.toggle('hidden', !s.exists()))
+          .catch(() => {});
+        // إعلان الإدارة
+        unsubSite = onSnapshot(doc(db, 'settings', 'site'), s => showAnnouncement(s.data()?.announcement), () => {});
         $('accountEmailLabel').textContent = user.email || '';
         $('passwordInput').value = '';
         let first = true;
@@ -614,9 +642,20 @@
         coffees = [];
         renderAll();
         closeAllModals();
+        $('adminLinkBtn').classList.add('hidden');
+        $('announcementBar').classList.add('hidden');
         $('loginModal').classList.remove('hidden');
       }
     });
+
+    function showAnnouncement(a) {
+      const bar = $('announcementBar');
+      if (!a || !a.enabled || !a.text) { bar.classList.add('hidden'); return; }
+      bar.textContent = a.text;
+      bar.className = 'mb-3 p-3 rounded-2xl text-xs font-bold border ' + (a.level === 'warn'
+        ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
+        : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-300');
+    }
 
     function closeAllModals() {
       ['entryModal', 'detailModal', 'backupModal', 'scannerResultModal', 'installGuideModal'].forEach(id => $(id).classList.add('hidden'));
